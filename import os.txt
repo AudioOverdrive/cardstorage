@@ -1,0 +1,255 @@
+import os
+def process_action():
+    while True:
+        option = input("Choose an option: decks, collection, or quit: ")
+        if option.lower() == "decks":
+            deck_action()
+        elif option.lower() == "collection":
+            collection_action()
+        elif option.lower() == "quit":
+            break
+        else:
+            print("Invalid option. Please choose 'decks', 'collection', or 'quit'.")
+
+def deck_action():
+    while True:
+        action = input("Choose an action: add, edit, view, remove, or back: ")
+        if action.lower() == "add":
+            add_deck()
+        elif action.lower() == "edit":
+            edit_deck()
+        elif action.lower() == "view":
+            view_deck()
+        elif action.lower() == "remove":
+            remove_deck()
+        elif action.lower() == "back":
+            break
+        else:
+            print("Invalid action. Please choose 'add', 'edit', 'view', 'remove', or 'back'.")
+
+def add_deck():
+    deck_name = input("Enter the deck name: ")
+    deck_file = f"{deck_name}.txt"
+    if os.path.isfile(deck_file):
+        print("Deck already exists.")
+        return
+
+    with open(deck_file, "w") as file:
+        print(f"Created a new deck: {deck_name}")
+
+
+def edit_deck():
+    deck_name = input("Enter the deck name: ")
+    deck_file = f"{deck_name}.txt"
+    if not os.path.isfile(deck_file):
+        print("Deck does not exist.")
+        return
+
+    while True:
+        action = input("Choose an action: add, remove, or back: ")
+        if action.lower() == "add":
+            add_card_to_deck(deck_file)
+        elif action.lower() == "remove":
+            remove_card_from_deck(deck_file)
+        elif action.lower() == "back":
+            break
+        else:
+            print("Invalid action. Please choose 'add', 'remove', or 'back'.")
+
+def add_card_to_deck(deck_file):
+    card_name = input("Enter the card name: ")
+    card_quantity = int(input("Enter the quantity: "))
+
+    with open(deck_file, "a") as file:
+        for _ in range(card_quantity):
+            file.write(f"{card_name}\n")
+
+    print(f"Added {card_quantity} card(s) to the deck.")
+
+def remove_card_from_deck(deck_file):
+    card_name = input("Enter the card name: ")
+    card_quantity = int(input("Enter the quantity: "))
+
+    with open(deck_file, "r") as file:
+        lines = file.readlines()
+
+    removed_count = 0
+    with open(deck_file, "w") as file:
+        for line in lines:
+            if line.strip() == card_name:
+                removed_count += 1
+                if removed_count <= card_quantity:
+                    continue
+            file.write(line)
+
+    if removed_count > 0:
+        print(f"Removed {removed_count} card(s) from the deck.")
+    else:
+        print(f"No cards found in the deck.")
+
+def view_deck():
+    deck_name = input("Enter the deck name: ")
+    deck_file = f"{deck_name}.txt"
+    if not os.path.isfile(deck_file):
+        print("Deck does not exist.")
+        return
+
+    with open(deck_file, "r") as file:
+        cards = file.readlines()
+
+    print(f"Cards in the deck '{deck_name}':")
+    for card in cards:
+        print(card.strip())
+
+def remove_deck():
+    deck_name = input("Enter the deck name: ")
+    deck_file = f"{deck_name}.txt"
+    if not os.path.isfile(deck_file):
+        print("Deck does not exist.")
+        return
+
+    os.remove(deck_file)
+    print(f"Removed the deck '{deck_name}'.")
+
+def collection_action():
+    while True:
+        action = input("Choose an action: add, check, remove, or back: ")
+        if action.lower() == "add":
+            add_card_to_collection()
+        elif action.lower() == "check":
+            check_card_in_collection()
+        elif action.lower() == "remove":
+            remove_card_from_collection()
+        elif action.lower() == "back":
+            break
+        else:
+            print("Invalid action. Please choose 'add', 'check', 'remove', or 'back'.")
+
+def add_card_to_collection():
+    card_name = input("Enter the card name: ")
+    card_set = input("Enter the card set: ")
+    card_number = input("Enter the card number: ")
+    quantity = int(input("Enter the quantity: "))
+
+    desktop_path = os.path.expanduser("~/Desktop")
+    collection_file = os.path.join(desktop_path, "collection_database.txt")
+
+    os.makedirs(desktop_path, exist_ok=True)
+
+    # Check if the collection file exists, create it if not
+    if not os.path.isfile(collection_file):
+        open(collection_file, "w").close()
+
+    with open(collection_file, "a") as file:
+        for _ in range(quantity):
+            file.write(f"Card Name: {card_name}\n")
+            file.write(f"Card Set: {card_set}\n")
+            file.write(f"Card Number: {card_number}\n")
+            file.write("-" * 20 + "\n")
+    print(f"Added {quantity} card(s): {card_name} ({card_set}, {card_number}) to the collection.")
+
+def check_card_in_collection():
+    card_name = input("Enter the card name: ")
+
+    desktop_path = os.path.expanduser("~/Desktop")
+    collection_file = os.path.join(desktop_path, "collection_database.txt")
+
+    if not os.path.isfile(collection_file):
+        print("The collection database file does not exist.")
+        return
+
+    found_cards = []
+    with open(collection_file, "r") as file:
+        contents = file.read()
+
+    sections = contents.split("-" * 20)
+    for section in sections:
+        if card_name.lower() in section.lower():
+            found_cards.append(section.strip())
+
+    if found_cards:
+        print(f"Found card(s) with name '{card_name}' in the collection:")
+        for card in found_cards:
+            print(card)
+    else:
+        print(f"No cards found with name '{card_name}' in the collection.")
+
+def add_card_to_collection():
+    card_name = input("Enter the card name: ")
+    card_set = input("Enter the card set: ")
+    card_number = input("Enter the card number: ")
+    quantity = int(input("Enter the quantity: "))
+
+    desktop_path = os.path.expanduser("~/Desktop")
+    collection_file = os.path.join(desktop_path, "collection_database.txt")
+
+    os.makedirs(desktop_path, exist_ok=True)
+
+    # Check if the collection file exists, create it if not
+    if not os.path.isfile(collection_file):
+        open(collection_file, "w").close()
+
+    with open(collection_file, "a") as file:
+        for _ in range(quantity):
+            file.write(f"Card Name: {card_name}\n")
+            file.write(f"Card Set: {card_set}\n")
+            file.write(f"Card Number: {card_number}\n")
+            file.write("-" * 20 + "\n")
+    print(f"Added {quantity} card(s): {card_name} ({card_set}, {card_number}) to the collection.")
+
+def remove_card_from_collection():
+    card_name = input("Enter the card name: ")
+    card_set = input("Enter the card set: ")
+    card_number = input("Enter the card number: ")
+    quantity = int(input("Enter the quantity: "))
+
+    desktop_path = os.path.expanduser("~/Desktop")
+    collection_file = os.path.join(desktop_path, "collection_database.txt")
+
+    if not os.path.isfile(collection_file):
+        print("The collection database file does not exist.")
+        return
+
+    with open(collection_file, "r") as file:
+        lines = file.readlines()
+
+    removed_count = 0
+    with open(collection_file, "w") as file:
+        i = 0
+        while i < len(lines):
+            if (
+                lines[i].strip().startswith("Card Name: ")
+                and lines[i + 1].strip().startswith("Card Set: ")
+                and lines[i + 2].strip().startswith("Card Number: ")
+            ):
+                curr_name = lines[i].strip().split("Card Name: ")[1]
+                curr_set = lines[i + 1].strip().split("Card Set: ")[1]
+                curr_number = lines[i + 2].strip().split("Card Number: ")[1]
+                if (
+                    card_name.lower() == curr_name.lower()
+                    and card_set.lower() == curr_set.lower()
+                    and card_number.lower() == curr_number.lower()
+                ):
+                    if removed_count < quantity:
+                        removed_count += 1
+                        i += 4  # Skip the lines for the card number and separator
+                        continue
+
+            # Write the lines for cards that are not being removed
+            file.write(lines[i])
+            i += 1
+
+    if removed_count > 0:
+        print(
+            f"Removed {removed_count} card(s) with name '{card_name}', set '{card_set}', and number '{card_number}' from the collection."
+        )
+    else:
+        print(
+            f"No cards found with name '{card_name}', set '{card_set}', and number '{card_number}' in the collection."
+        )
+
+while True:
+    process_action()
+    restart = input("Do you want to start over? (yes/no) ")
+    if restart.lower() != "yes":
+        break
